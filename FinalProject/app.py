@@ -142,7 +142,7 @@ if 'session_id' not in st.session_state:
     st.session_state.session_id = 0
 
 # ---------- Streamlit App ----------
-st.title("📘 Report Card Generator")
+st.title("📘 Academic Management System")
 
 progress_file = "progress_multi.csv"
 school_info_file = "school_info.csv"
@@ -561,4 +561,5 @@ with tab4:
         else:
             st.info(f"No data available for {subject_term}, {subject_session}")
     else:
+
         st.info("No student data available yet.")
