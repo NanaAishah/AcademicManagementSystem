@@ -1,4 +1,4 @@
-# 📘Report Card Generator  
+# 📘Academic Management System  
 
 A comprehensive web application built with **Streamlit** for schools to create, manage, and analyze student academic reports.  
 
