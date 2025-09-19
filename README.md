@@ -35,7 +35,7 @@ A comprehensive web application built with **Streamlit** for schools to create, 
 
 ---
 
-## 🛠️ Built With  
+## Built With  
 
 - [Python](https://www.python.org/) – Core programming language  
 - [Streamlit](https://streamlit.io/) – Web application framework  
@@ -44,5 +44,4 @@ A comprehensive web application built with **Streamlit** for schools to create, 
 
 ---
 
-ithub.com/your-username/nigerian-report-card-generator.git
-   cd nigerian-report-card-generator
+
