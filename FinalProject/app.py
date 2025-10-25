@@ -192,6 +192,57 @@ sessions = [f"{year}/{year+1}" for year in range(2020, 2031)]
 tab1, tab2, tab3, tab4 = st.tabs(["Record Student Marks", "Saved Data / Export", "Overall Best Students", "Subject Best Students"])
 
 with tab1:
+    # School Logo Upload Section - IMPROVED VERSION
+    st.subheader("🏫 School Logo Setup")
+    st.info("Upload your school logo to appear on all report cards")
+
+    # Create columns for better layout
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        uploaded_logo = st.file_uploader(
+            "Choose your school logo image", 
+            type=['png', 'jpg', 'jpeg'], 
+            key="logo_upload",
+            help="Upload a clear logo in PNG, JPG, or JPEG format. Recommended size: 150x150 pixels for best quality."
+        )
+        
+        if uploaded_logo is not None:
+            # Save the uploaded logo
+            try:
+                with open("school_logo.png", "wb") as f:
+                    f.write(uploaded_logo.getbuffer())
+                st.success("✅ School logo uploaded successfully! It will appear on all report cards.")
+            except Exception as e:
+                st.error(f"❌ Error saving logo: {e}")
+        
+        # Logo management options
+        if os.path.exists("school_logo.png"):
+            if st.button("🗑️ Remove Current Logo", key="remove_logo"):
+                try:
+                    os.remove("school_logo.png")
+                    st.success("✅ Logo removed successfully!")
+                    st.rerun()  # Refresh the app to show changes
+                except Exception as e:
+                    st.error(f"❌ Error removing logo: {e}")
+
+    with col2:
+        # Logo preview section
+        if uploaded_logo is not None:
+            st.image(uploaded_logo, width=150, caption="New Logo Preview")
+        elif os.path.exists("school_logo.png"):
+            try:
+                st.image("school_logo.png", width=150, caption="Current School Logo")
+                st.success("✅ Logo is set up!")
+            except:
+                st.warning("⚠️ Could not load current logo")
+        else:
+            st.info("👆 Upload a logo to see preview")
+
+    # Additional information
+    st.markdown("---")
+    st.caption("💡 **Tips:** For best results, use a square logo with transparent background in PNG format.")
+    
     # Student Info - Select first
     student_names = df_progress_all['Student_Name'].unique().tolist() if not df_progress_all.empty else []
     student_name = st.selectbox("Select Student", options=[""] + student_names, key="student_select")
@@ -279,31 +330,6 @@ with tab1:
         saved_subjects = []
         class_teacher_comment_default = ""
         principal_comment_default = ""
-
-    # School Logo Upload Section
-    st.subheader("🏫 School Logo Setup")
-    st.info("Upload your school logo to appear on all report cards")
-    
-    uploaded_logo = st.file_uploader(
-        "Choose your school logo image", 
-        type=['png', 'jpg', 'jpeg'], 
-        key="logo_upload",
-        help="Upload a clear logo in PNG, JPG, or JPEG format"
-    )
-    
-    if uploaded_logo is not None:
-        # Save the uploaded logo
-        with open("school_logo.png", "wb") as f:
-            f.write(uploaded_logo.getbuffer())
-        st.success("✅ School logo uploaded successfully! It will appear on all report cards.")
-        st.image(uploaded_logo, width=150, caption="Your School Logo Preview")
-    elif os.path.exists("school_logo.png"):
-        st.success("✅ School logo is already set up!")
-        st.image("school_logo.png", width=150, caption="Current School Logo")
-        if st.button("🔄 Change School Logo", key="change_logo"):
-            st.info("Upload a new logo above to replace the current one")
-    else:
-        st.warning("⚠️ No school logo uploaded yet. Report cards will be generated without a logo.")
 
     # Subjects - Fixed subjects
     fixed_subjects = ["Mathematics", "English"]
