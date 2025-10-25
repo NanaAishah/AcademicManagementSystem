@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from io import BytesIO
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -36,6 +36,18 @@ def create_pdf(school_name, school_address, student_name, student_class, student
     normal_style = styles["Normal"]
     normal_style.fontSize = 7
     center_style = ParagraphStyle(name="center", alignment=1, fontSize=7)
+
+    # School Logo (if provided)
+    logo_path = "school_logo.png"  # Default logo path
+    if os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path, width=2*cm, height=2*cm)
+            logo.hAlign = 'CENTER'
+            elements.append(logo)
+            elements.append(Spacer(1, 6))
+        except:
+            # If logo loading fails, continue without logo
+            pass
 
     # School Name & Address
     elements.append(Paragraph(f"<b>{school_name}</b>", ParagraphStyle(name="center_title", alignment=1, fontSize=12)))
@@ -267,6 +279,31 @@ with tab1:
         saved_subjects = []
         class_teacher_comment_default = ""
         principal_comment_default = ""
+
+    # School Logo Upload Section
+    st.subheader("🏫 School Logo Setup")
+    st.info("Upload your school logo to appear on all report cards")
+    
+    uploaded_logo = st.file_uploader(
+        "Choose your school logo image", 
+        type=['png', 'jpg', 'jpeg'], 
+        key="logo_upload",
+        help="Upload a clear logo in PNG, JPG, or JPEG format"
+    )
+    
+    if uploaded_logo is not None:
+        # Save the uploaded logo
+        with open("school_logo.png", "wb") as f:
+            f.write(uploaded_logo.getbuffer())
+        st.success("✅ School logo uploaded successfully! It will appear on all report cards.")
+        st.image(uploaded_logo, width=150, caption="Your School Logo Preview")
+    elif os.path.exists("school_logo.png"):
+        st.success("✅ School logo is already set up!")
+        st.image("school_logo.png", width=150, caption="Current School Logo")
+        if st.button("🔄 Change School Logo", key="change_logo"):
+            st.info("Upload a new logo above to replace the current one")
+    else:
+        st.warning("⚠️ No school logo uploaded yet. Report cards will be generated without a logo.")
 
     # Subjects - Fixed subjects
     fixed_subjects = ["Mathematics", "English"]
@@ -561,5 +598,4 @@ with tab4:
         else:
             st.info(f"No data available for {subject_term}, {subject_session}")
     else:
-
         st.info("No student data available yet.")
