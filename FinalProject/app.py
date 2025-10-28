@@ -213,6 +213,7 @@ with tab1:
                 with open("school_logo.png", "wb") as f:
                     f.write(uploaded_logo.getbuffer())
                 st.success("✅ School logo uploaded successfully! It will appear on all report cards.")
+                st.rerun()
             except Exception as e:
                 st.error(f"❌ Error saving logo: {e}")
         
@@ -368,42 +369,44 @@ with tab1:
     records = []
     total_obt_all = 0
     total_max_all = 0
+    subjects_with_scores = 0
     
     # Use session ID for unique keys
     session_id = st.session_state.session_id
     
     for subject in subjects:
         saved_row = df_student_prev[df_student_prev['Subject'] == subject]
-        ca1_obt_default = int(saved_row['CA1_Obt'].values[0]) if not saved_row.empty and saved_row['CA1_Obt'].values[0] not in ["", None] else 0
-        ca1_max_default = int(saved_row['CA1_Max'].values[0]) if not saved_row.empty and saved_row['CA1_Max'].values[0] not in ["", None] else 20
-        ca2_obt_default = int(saved_row['CA2_Obt'].values[0]) if not saved_row.empty and saved_row['CA2_Obt'].values[0] not in ["", None] else 0
-        ca2_max_default = int(saved_row['CA2_Max'].values[0]) if not saved_row.empty and saved_row['CA2_Max'].values[0] not in ["", None] else 20
-        exam_obt_default = int(saved_row['Exam_Obt'].values[0]) if not saved_row.empty and saved_row['Exam_Obt'].values[0] not in ["", None] else 0
-        exam_max_default = int(saved_row['Exam_Max'].values[0]) if not saved_row.empty and saved_row['Exam_Max'].values[0] not in ["", None] else 60
+        # Set default values to empty string instead of 0
+        ca1_obt_default = saved_row['CA1_Obt'].values[0] if not saved_row.empty and saved_row['CA1_Obt'].values[0] not in ["", None] else ""
+        ca1_max_default = saved_row['CA1_Max'].values[0] if not saved_row.empty and saved_row['CA1_Max'].values[0] not in ["", None] else ""
+        ca2_obt_default = saved_row['CA2_Obt'].values[0] if not saved_row.empty and saved_row['CA2_Obt'].values[0] not in ["", None] else ""
+        ca2_max_default = saved_row['CA2_Max'].values[0] if not saved_row.empty and saved_row['CA2_Max'].values[0] not in ["", None] else ""
+        exam_obt_default = saved_row['Exam_Obt'].values[0] if not saved_row.empty and saved_row['Exam_Obt'].values[0] not in ["", None] else ""
+        exam_max_default = saved_row['Exam_Max'].values[0] if not saved_row.empty and saved_row['Exam_Max'].values[0] not in ["", None] else ""
 
         st.subheader(f"{subject}")
         col1, col2 = st.columns(2)
         with col1:
             # Use unique keys with session ID to avoid duplicates
-            ca1_obt = st.number_input(f"1st CA Obtained", min_value=0, step=1, 
-                                     value=st.session_state.form_data.get(f"{subject}_ca1_obt", ca1_obt_default), 
-                                     key=f"{session_id}_{subject}_ca1_obt")
-            ca2_obt = st.number_input(f"2nd CA Obtained", min_value=0, step=1, 
-                                     value=st.session_state.form_data.get(f"{subject}_ca2_obt", ca2_obt_default), 
-                                     key=f"{session_id}_{subject}_ca2_obt")
-            exam_obt = st.number_input(f"Exam Obtained", min_value=0, step=1, 
-                                      value=st.session_state.form_data.get(f"{subject}_exam_obt", exam_obt_default), 
-                                      key=f"{session_id}_{subject}_exam_obt")
+            ca1_obt = st.text_input(f"1st CA Obtained", 
+                                   value=str(st.session_state.form_data.get(f"{subject}_ca1_obt", ca1_obt_default)), 
+                                   key=f"{session_id}_{subject}_ca1_obt")
+            ca2_obt = st.text_input(f"2nd CA Obtained", 
+                                   value=str(st.session_state.form_data.get(f"{subject}_ca2_obt", ca2_obt_default)), 
+                                   key=f"{session_id}_{subject}_ca2_obt")
+            exam_obt = st.text_input(f"Exam Obtained", 
+                                    value=str(st.session_state.form_data.get(f"{subject}_exam_obt", exam_obt_default)), 
+                                    key=f"{session_id}_{subject}_exam_obt")
         with col2:
-            ca1_max = st.number_input(f"1st CA Obtainable", min_value=1, step=1, 
-                                     value=st.session_state.form_data.get(f"{subject}_ca1_max", ca1_max_default), 
-                                     key=f"{session_id}_{subject}_ca1_max")
-            ca2_max = st.number_input(f"2nd CA Obtainable", min_value=1, step=1, 
-                                     value=st.session_state.form_data.get(f"{subject}_ca2_max", ca2_max_default), 
-                                     key=f"{session_id}_{subject}_ca2_max")
-            exam_max = st.number_input(f"Exam Obtainable", min_value=1, step=1, 
-                                      value=st.session_state.form_data.get(f"{subject}_exam_max", exam_max_default), 
-                                      key=f"{session_id}_{subject}_exam_max")
+            ca1_max = st.text_input(f"1st CA Obtainable", 
+                                   value=str(st.session_state.form_data.get(f"{subject}_ca1_max", ca1_max_default)), 
+                                   key=f"{session_id}_{subject}_ca1_max")
+            ca2_max = st.text_input(f"2nd CA Obtainable", 
+                                   value=str(st.session_state.form_data.get(f"{subject}_ca2_max", ca2_max_default)), 
+                                   key=f"{session_id}_{subject}_ca2_max")
+            exam_max = st.text_input(f"Exam Obtainable", 
+                                    value=str(st.session_state.form_data.get(f"{subject}_exam_max", exam_max_default)), 
+                                    key=f"{session_id}_{subject}_exam_max")
 
         # Store form data in session state
         st.session_state.form_data[f"{subject}_ca1_obt"] = ca1_obt
@@ -413,15 +416,51 @@ with tab1:
         st.session_state.form_data[f"{subject}_exam_obt"] = exam_obt
         st.session_state.form_data[f"{subject}_exam_max"] = exam_max
 
-        total_obt = ca1_obt + ca2_obt + exam_obt
-        total_max = ca1_max + ca2_max + exam_max
-        total_obt_all += total_obt
-        total_max_all += total_max
-        grade, remark = calculate_grade_mark(total_obt, total_max)
-        records.append([subject, ca1_obt, ca1_max, ca2_obt, ca2_max, exam_obt, exam_max, total_obt, total_max, grade, remark])
+        # Convert empty strings to 0 for calculation, but keep blanks for display
+        ca1_obt_num = float(ca1_obt) if ca1_obt.strip() else 0
+        ca1_max_num = float(ca1_max) if ca1_max.strip() else 0
+        ca2_obt_num = float(ca2_obt) if ca2_obt.strip() else 0
+        ca2_max_num = float(ca2_max) if ca2_max.strip() else 0
+        exam_obt_num = float(exam_obt) if exam_obt.strip() else 0
+        exam_max_num = float(exam_max) if exam_max.strip() else 0
+
+        # Check if any score is entered for this subject
+        has_scores = any([ca1_obt.strip(), ca1_max.strip(), ca2_obt.strip(), ca2_max.strip(), exam_obt.strip(), exam_max.strip()])
+        
+        if has_scores:
+            total_obt = ca1_obt_num + ca2_obt_num + exam_obt_num
+            total_max = ca1_max_num + ca2_max_num + exam_max_num
+            total_obt_all += total_obt
+            total_max_all += total_max
+            subjects_with_scores += 1
+            grade, remark = calculate_grade_mark(total_obt, total_max)
+        else:
+            # Leave blank if no scores entered
+            total_obt = ""
+            total_max = ""
+            grade = ""
+            remark = ""
+
+        # Store the display values (keep blanks for empty fields)
+        records.append([subject, 
+                       ca1_obt if ca1_obt.strip() else "", 
+                       ca1_max if ca1_max.strip() else "",
+                       ca2_obt if ca2_obt.strip() else "", 
+                       ca2_max if ca2_max.strip() else "",
+                       exam_obt if exam_obt.strip() else "", 
+                       exam_max if exam_max.strip() else "",
+                       total_obt, 
+                       total_max,
+                       grade, 
+                       remark])
 
     df_student = pd.DataFrame(records, columns=["Subject", "CA1_Obt", "CA1_Max", "CA2_Obt", "CA2_Max", "Exam_Obt", "Exam_Max", "Total_Obt", "Total_Max", "Grade", "Remark"])
-    average_score = df_student["Total_Obt"].mean() if len(df_student) > 0 else 0
+    
+    # Calculate average only for subjects with scores
+    if subjects_with_scores > 0:
+        average_score = total_obt_all / subjects_with_scores
+    else:
+        average_score = 0
 
     # Comments
     class_teacher_comment = st.text_area("Class Teacher's Comment", value=class_teacher_comment_default, key="teacher_comment")
@@ -442,6 +481,7 @@ with tab1:
     st.text(f"Total Marks: {total_obt_all} / {total_max_all}")
     percentage = (total_obt_all / total_max_all) * 100 if total_max_all > 0 else 0
     st.text(f"Percentage: {percentage:.2f}%")
+    st.text(f"Subjects with scores: {subjects_with_scores}")
 
     # Save Progress
     if st.button("💾 Save Progress", key="save_button"):
@@ -459,25 +499,53 @@ with tab1:
               (df_progress_all["Session"] == session))
         ]
         
-        # Add new records
-        new_records = df_student.copy()
-        new_records["Student_Name"] = student_name
-        new_records["Class"] = student_class
-        new_records["Term"] = term
-        new_records["Session"] = session
-        new_records["Teacher_Comment"] = class_teacher_comment
-        new_records["Principal_Comment"] = principal_comment
-        new_records["School_Name"] = school_name
-        new_records["School_Address"] = school_address
+        # Add new records - only include subjects with scores
+        new_records = []
+        for record in records:
+            subject_data = {
+                "Subject": record[0],
+                "CA1_Obt": record[1],
+                "CA1_Max": record[2],
+                "CA2_Obt": record[3],
+                "CA2_Max": record[4],
+                "Exam_Obt": record[5],
+                "Exam_Max": record[6],
+                "Total_Obt": record[7],
+                "Total_Max": record[8],
+                "Grade": record[9],
+                "Remark": record[10],
+                "Student_Name": student_name,
+                "Class": student_class,
+                "Term": term,
+                "Session": session,
+                "Teacher_Comment": class_teacher_comment,
+                "Principal_Comment": principal_comment,
+                "School_Name": school_name,
+                "School_Address": school_address
+            }
+            # Only save if the subject has at least one score
+            if any([record[1], record[2], record[3], record[4], record[5], record[6]]):
+                new_records.append(subject_data)
         
-        df_progress_all = pd.concat([df_progress_all, new_records], ignore_index=True)
-        df_progress_all.to_csv(progress_file, index=False)
-        st.success(f"Progress saved for {student_name} ({term}, {session})!")
+        if new_records:
+            new_records_df = pd.DataFrame(new_records)
+            df_progress_all = pd.concat([df_progress_all, new_records_df], ignore_index=True)
+            df_progress_all.to_csv(progress_file, index=False)
+            st.success(f"Progress saved for {student_name} ({term}, {session})! {len(new_records)} subjects with scores saved.")
+        else:
+            st.warning("No subjects with scores to save.")
+        
         # Clear form data after saving
         st.session_state.form_data = {}
 
     # PDF Preview & Download
     if st.button("📥 Generate PDF & Download / Preview", key="pdf_button"):
+        # Filter out subjects with no scores for PDF
+        df_student_for_pdf = df_student.copy()
+        # Remove rows where all score columns are empty
+        score_columns = ["CA1_Obt", "CA1_Max", "CA2_Obt", "CA2_Max", "Exam_Obt", "Exam_Max"]
+        df_student_for_pdf = df_student_for_pdf[df_student_for_pdf[score_columns].apply(lambda x: any(pd.notna(val) and str(val).strip() != "" for val in x), axis=1)]
+        
         pdf_buffer = create_pdf(
             school_name=school_name,
             school_address=school_address,
@@ -486,7 +554,7 @@ with tab1:
             student_number=student_number,
             term=term,
             session=session,
-            df=df_student,
+            df=df_student_for_pdf,
             total_obt=total_obt_all,
             total_max=total_max_all,
             average=average_score,
@@ -531,8 +599,8 @@ with tab2:
             aggfunc="first"
         ).reset_index()
         
-        # Fill NaN values with 0 or appropriate placeholder
-        pivot_df = pivot_df.fillna(0)
+        # Fill NaN values with empty string instead of 0
+        pivot_df = pivot_df.fillna("")
         
         st.dataframe(pivot_df)
         
@@ -561,25 +629,37 @@ with tab3:
         ]
         
         if not filtered_df.empty:
-            # Calculate total marks and percentage for each student
-            student_totals = filtered_df.groupby(["Student_Name", "Class"]).agg({
-                "Total_Obt": "sum",
-                "Total_Max": "sum"
-            }).reset_index()
+            # Convert string values to numeric, treating empty strings as NaN
+            filtered_df_numeric = filtered_df.copy()
+            numeric_cols = ["Total_Obt", "Total_Max"]
+            for col in numeric_cols:
+                filtered_df_numeric[col] = pd.to_numeric(filtered_df_numeric[col], errors='coerce')
             
-            student_totals["Percentage"] = (student_totals["Total_Obt"] / student_totals["Total_Max"]) * 100
+            # Remove rows with NaN values (subjects without scores)
+            filtered_df_numeric = filtered_df_numeric.dropna(subset=numeric_cols)
             
-            # Sort by percentage in descending order
-            student_totals = student_totals.sort_values("Percentage", ascending=False)
-            
-            # Add position column with ordinal numbers (1st, 2nd, 3rd, etc.)
-            student_totals["Position"] = [get_ordinal_position(i+1) for i in range(len(student_totals))]
-            
-            # Format the display
-            display_df = student_totals[["Position", "Student_Name", "Class", "Total_Obt", "Total_Max", "Percentage"]].copy()
-            display_df["Percentage"] = display_df["Percentage"].round(2).astype(str) + "%"
-            
-            st.dataframe(display_df)
+            if not filtered_df_numeric.empty:
+                # Calculate total marks and percentage for each student
+                student_totals = filtered_df_numeric.groupby(["Student_Name", "Class"]).agg({
+                    "Total_Obt": "sum",
+                    "Total_Max": "sum"
+                }).reset_index()
+                
+                student_totals["Percentage"] = (student_totals["Total_Obt"] / student_totals["Total_Max"]) * 100
+                
+                # Sort by percentage in descending order
+                student_totals = student_totals.sort_values("Percentage", ascending=False)
+                
+                # Add position column with ordinal numbers (1st, 2nd, 3rd, etc.)
+                student_totals["Position"] = [get_ordinal_position(i+1) for i in range(len(student_totals))]
+                
+                # Format the display
+                display_df = student_totals[["Position", "Student_Name", "Class", "Total_Obt", "Total_Max", "Percentage"]].copy()
+                display_df["Percentage"] = display_df["Percentage"].round(2).astype(str) + "%"
+                
+                st.dataframe(display_df)
+            else:
+                st.info(f"No students with complete score data for {best_term}, {best_session}")
         else:
             st.info(f"No data available for {best_term}, {best_session}")
     else:
@@ -604,23 +684,34 @@ with tab4:
         ]
         
         if not filtered_df.empty:
-            subjects = filtered_df["Subject"].unique()
-            selected_subject = st.selectbox("Select Subject", options=subjects, key="subject_select")
+            # Convert to numeric and remove empty scores
+            filtered_df_numeric = filtered_df.copy()
+            numeric_cols = ["Total_Obt", "Total_Max"]
+            for col in numeric_cols:
+                filtered_df_numeric[col] = pd.to_numeric(filtered_df_numeric[col], errors='coerce')
             
-            # Get data for selected subject
-            subject_data = filtered_df[filtered_df["Subject"] == selected_subject].copy()
-            subject_data["Percentage"] = (subject_data["Total_Obt"] / subject_data["Total_Max"]) * 100
+            filtered_df_numeric = filtered_df_numeric.dropna(subset=numeric_cols)
             
-            # Sort by percentage in descending order
-            subject_data = subject_data.sort_values("Percentage", ascending=False)
-            
-            # Add position column with ordinal numbers (1st, 2nd, 3rd, etc.)
-            subject_data["Position"] = [get_ordinal_position(i+1) for i in range(len(subject_data))]
-            
-            # Format the display
-            display_df = subject_data[["Position", "Student_Name", "Class", "Total_Obt", "Total_Max"]].copy()
-            
-            st.dataframe(display_df)
+            if not filtered_df_numeric.empty:
+                subjects = filtered_df_numeric["Subject"].unique()
+                selected_subject = st.selectbox("Select Subject", options=subjects, key="subject_select")
+                
+                # Get data for selected subject
+                subject_data = filtered_df_numeric[filtered_df_numeric["Subject"] == selected_subject].copy()
+                subject_data["Percentage"] = (subject_data["Total_Obt"] / subject_data["Total_Max"]) * 100
+                
+                # Sort by percentage in descending order
+                subject_data = subject_data.sort_values("Percentage", ascending=False)
+                
+                # Add position column with ordinal numbers (1st, 2nd, 3rd, etc.)
+                subject_data["Position"] = [get_ordinal_position(i+1) for i in range(len(subject_data))]
+                
+                # Format the display
+                display_df = subject_data[["Position", "Student_Name", "Class", "Total_Obt", "Total_Max"]].copy()
+                
+                st.dataframe(display_df)
+            else:
+                st.info(f"No subjects with complete score data for {subject_term}, {subject_session}")
         else:
             st.info(f"No data available for {subject_term}, {subject_session}")
     else:
